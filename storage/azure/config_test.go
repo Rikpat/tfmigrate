@@ -20,7 +20,6 @@ func TestConfigNewStorage(t *testing.T) {
 		{
 			desc: "valid",
 			config: &Config{
-				AccessKey:     "ZHVtbXkK", // expected to be a base64-encoded string
 				AccountName:   "tfmigrate-test",
 				ContainerName: "tfmigrate",
 				Key:           "history.json",
