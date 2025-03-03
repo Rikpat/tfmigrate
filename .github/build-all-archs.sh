@@ -9,7 +9,7 @@ for platform in $BUILD_ARCHS; do
         output_name+='.exe'
     fi
 
-    env GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=0 go build -o $output_name github.com/Rikpat/tfmigrate
+    env GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=0 go build -o $output_name github.com/minamijoyo/tfmigrate
     if [ $? -ne 0 ]; then
         echo 'An error has occurred! Aborting the script execution...'
         exit 1
