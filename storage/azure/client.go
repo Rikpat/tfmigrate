@@ -5,9 +5,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 )
 
@@ -25,14 +25,18 @@ type client struct {
 
 // newClient returns a new instance of Client.
 func newClient(config *Config) (Client, error) {
+	// If the access key isn't defined in the configuration, try to read it from the environment.
+	if config.AccessKey == "" {
+		config.AccessKey = os.Getenv("ARM_ACCESS_KEY")
+	}
 
-	cred, err := azidentity.NewDefaultAzureCredential(nil)
+	cred, err := azblob.NewSharedKeyCredential(config.AccountName, config.AccessKey)
 	if err != nil {
 		return nil, err
 	}
 
 	url := fmt.Sprintf("https://%s.blob.core.windows.net/", config.AccountName)
-	c, err := azblob.NewClient(url, cred, nil)
+	c, err := azblob.NewClientWithSharedKeyCredential(url, cred, nil)
 
 	return &client{c}, err
 }
