@@ -28,7 +28,7 @@ jobs:
     - name: Build
       run: ./.github/build-all-archs.sh
       env: 
-        BUILD_ARCHS: "windows/amd64 darwin/amd64 darwin/arm64 linux/amd64 linux/arm64"
+        BUILD_ARCHS: "linux/amd64"
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4
@@ -36,20 +36,20 @@ jobs:
         name: dist
         path: dist
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+    # - name: Set up QEMU
+    #   uses: docker/setup-qemu-action@v3
 
-    - name: Set up Docker Buildx
-      id: buildx
-      uses: docker/setup-buildx-action@v3
+    # - name: Set up Docker Buildx
+    #   id: buildx
+    #   uses: docker/setup-buildx-action@v3
 
-    - name: Test Build Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        platforms: linux/arm64, linux/amd64
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+    # - name: Test Build Docker image
+    #   uses: docker/build-push-action@v5
+    #   with:
+    #     context: .
+    #     platforms: linux/arm64, linux/amd64
+    #     cache-from: type=gha
+    #     cache-to: type=gha,mode=max
         
   docker:
     if: github.event_name != 'pull_request'
@@ -60,12 +60,12 @@ jobs:
       contents: write
       packages: write
     steps:
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+    # - name: Set up QEMU
+    #   uses: docker/setup-qemu-action@v3
 
-    - name: Set up Docker Buildx
-      id: buildx
-      uses: docker/setup-buildx-action@v3
+    # - name: Set up Docker Buildx
+    #   id: buildx
+    #   uses: docker/setup-buildx-action@v3
 
     - uses: actions/checkout@v4
 
@@ -76,17 +76,17 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: |
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-        tags: |
-          type=sha
-          type=semver,value=${{ steps.tag_version.outputs.new_tag }},pattern={{version}}
-          type=semver,value=${{ steps.tag_version.outputs.new_tag }},pattern={{major}}.{{minor}}
-          type=semver,value=${{ steps.tag_version.outputs.new_tag }},pattern={{major}}
+    # - name: Docker meta
+    #   id: meta
+    #   uses: docker/metadata-action@v5
+    #   with:
+    #     images: |
+    #       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+    #     tags: |
+    #       type=sha
+    #       type=semver,value=${{ steps.tag_version.outputs.new_tag }},pattern={{version}}
+    #       type=semver,value=${{ steps.tag_version.outputs.new_tag }},pattern={{major}}.{{minor}}
+    #       type=semver,value=${{ steps.tag_version.outputs.new_tag }},pattern={{major}}
 
     - name: Download a Build Artifact
       uses: actions/download-artifact@v4
@@ -103,21 +103,21 @@ jobs:
         body: ${{ steps.tag_version.outputs.changelog }}
         artifacts: "dist/*"
 
-    - name: Login to ${{ env.REGISTRY }}
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Login to ${{ env.REGISTRY }}
+    #   uses: docker/login-action@v3
+    #   with:
+    #     registry: ${{ env.REGISTRY }}
+    #     username: ${{ github.actor }}
+    #     password: ${{ secrets.GITHUB_TOKEN }}
 
-    # Should be fully cached from build job
-    - name: Build and Push Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: true
-        platforms: linux/arm64, linux/amd64
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+    # # Should be fully cached from build job
+    # - name: Build and Push Docker image
+    #   uses: docker/build-push-action@v5
+    #   with:
+    #     context: .
+    #     push: true
+    #     platforms: linux/arm64, linux/amd64
+    #     tags: ${{ steps.meta.outputs.tags }}
+    #     labels: ${{ steps.meta.outputs.labels }}
+    #     cache-from: type=gha
+    #     cache-to: type=gha,mode=max
